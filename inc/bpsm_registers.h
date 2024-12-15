@@ -8,7 +8,12 @@
 #ifndef __BPSM_REGISTERS_H__
 #define __BPSM_REGISTERS_H__
 
+#ifndef UNA_AT_DISABLE_FLAGS_FILE
+#include "una_at_flags.h"
+#endif
 #include "common_registers.h"
+#include "types.h"
+#include "una.h"
 
 /*** BPSM REGISTERS structures ***/
 
@@ -50,5 +55,17 @@ typedef enum {
 #define BPSM_REGISTER_ANALOG_DATA_1_MASK_VSTR                   0xFFFF0000
 
 #define BPSM_REGISTER_ANALOG_DATA_2_MASK_VBKP                   0x0000FFFF
+
+/*** BPSM REGISTERS global variables ***/
+
+#ifdef UNA_AT_USE_REGISTER_ACCESS
+extern const UNA_register_access_t BPSM_REGISTER_ACCESS[BPSM_REGISTER_ADDRESS_LAST];
+#endif
+#ifdef UNA_AT_USE_REGISTER_ACCESS_TIMEOUT
+extern const uint32_t BPSM_REGISTER_ACCESS_TIMEOUT_MS[BPSM_REGISTER_ADDRESS_LAST];
+#endif
+#ifdef UNA_AT_USE_REGISTER_ERROR_VALUE
+extern const uint32_t BPSM_REGISTER_ERROR_VALUE[BPSM_REGISTER_ADDRESS_LAST];
+#endif
 
 #endif /* __BPSM_REGISTERS_H__ */

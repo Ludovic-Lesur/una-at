@@ -8,7 +8,12 @@
 #ifndef __GPSM_REGISTERS_H__
 #define __GPSM_REGISTERS_H__
 
+#ifndef UNA_AT_DISABLE_FLAGS_FILE
+#include "una_at_flags.h"
+#endif
 #include "common_registers.h"
+#include "types.h"
+#include "una.h"
 
 /*** GPSM REGISTERS structures ***/
 
@@ -90,5 +95,17 @@ typedef enum {
 #define GPSM_REGISTER_GEOLOC_DATA_3_MASK_HDOP                   0xFFF00000
 #define GPSM_REGISTER_GEOLOC_DATA_3_MASK_NSAT                   0x000F0000
 #define GPSM_REGISTER_GEOLOC_DATA_3_MASK_FIX_DURATION           0x0000FFFF
+
+/*** GPSM REGISTERS global variables ***/
+
+#ifdef UNA_AT_USE_REGISTER_ACCESS
+extern const UNA_register_access_t GPSM_REGISTER_ACCESS[GPSM_REGISTER_ADDRESS_LAST];
+#endif
+#ifdef UNA_AT_USE_REGISTER_ACCESS_TIMEOUT
+extern const uint32_t GPSM_REGISTER_ACCESS_TIMEOUT_MS[GPSM_REGISTER_ADDRESS_LAST];
+#endif
+#ifdef UNA_AT_USE_REGISTER_ERROR_VALUE
+extern const uint32_t GPSM_REGISTER_ERROR_VALUE[GPSM_REGISTER_ADDRESS_LAST];
+#endif
 
 #endif /* __GPSM_REGISTERS_H__ */

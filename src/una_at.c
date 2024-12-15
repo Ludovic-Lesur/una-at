@@ -43,8 +43,6 @@
 #define UNA_AT_REPLY_OK                 "OK"
 #define UNA_AT_REPLY_ERROR              "ERROR"
 #define UNA_AT_REPLY_END                STRING_CHAR_CR
-
-#define UNA_AT_DEFAULT_TIMEOUT_MS       200
 #endif
 
 /*** UNA AT local structures ***/

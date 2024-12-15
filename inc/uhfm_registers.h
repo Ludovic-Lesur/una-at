@@ -8,7 +8,12 @@
 #ifndef __UHFM_REGISTERS_H__
 #define __UHFM_REGISTERS_H__
 
+#ifndef UNA_AT_DISABLE_FLAGS_FILE
+#include "una_at_flags.h"
+#endif
 #include "common_registers.h"
+#include "types.h"
+#include "una.h"
 
 /*** UHFM REGISTERS structures ***/
 
@@ -74,5 +79,17 @@ typedef enum {
 
 #define UHFM_REGISTER_RADIO_TEST_1_MASK_TX_POWER        0x000000FF
 #define UHFM_REGISTER_RADIO_TEST_1_MASK_RSSI            0x0000FF00
+
+/*** UHFM REGISTERS global variables ***/
+
+#ifdef UNA_AT_USE_REGISTER_ACCESS
+extern const UNA_register_access_t UHFM_REGISTER_ACCESS[UHFM_REGISTER_ADDRESS_LAST];
+#endif
+#ifdef UNA_AT_USE_REGISTER_ACCESS_TIMEOUT
+extern const uint32_t UHFM_REGISTER_ACCESS_TIMEOUT_MS[UHFM_REGISTER_ADDRESS_LAST];
+#endif
+#ifdef UNA_AT_USE_REGISTER_ERROR_VALUE
+extern const uint32_t UHFM_REGISTER_ERROR_VALUE[UHFM_REGISTER_ADDRESS_LAST];
+#endif
 
 #endif /* __UHFM_REGISTERS_H__ */

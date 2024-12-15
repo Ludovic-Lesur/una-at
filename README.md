@@ -21,9 +21,12 @@ Here is the versions compatibility table:
 | **Flag name** | **Value** | **Description** |
 |:---:|:---:|:---:|
 | `UNA_AT_DISABLE_FLAGS_FILE` | `defined` / `undefined` | Disable the `una_at_flags.h` header file inclusion when compilation flags are given in the project settings or by command line. |
-| `UNA_AT_DISABLE` | `defined` / `undefined` | Disable the UNA library. |
+| `UNA_AT_DISABLE` | `defined` / `undefined` | Disable the UNA AT functions. |
 | `UNA_AT_DELAY_ERROR_BASE_LAST` | `<value>` | Last error base of the low level delay driver. |
 | `UNA_AT_MODE_MASTER` | `defined` / `undefined` | Enable master operating mode. |
 | `UNA_AT_MODE_SLAVE` | `defined` / `undefined` | Enable slave operating mode. |
-| `UNA_AT_TERMINAL_INSTANCE` | `<value>` | Instance of the terminal used to transmit and receive data. |
+| `UNA_AT_USE_REGISTER_ACCESS` | `defined` / `undefined` | Enable register access definitions. |
+| `UNA_AT_USE_REGISTER_ACCESS_TIMEOUT` | `defined` / `undefined` | Enable register access timeout definitions. |
+| `UNA_AT_USE_REGISTER_ERROR_VALUE` | `defined` / `undefined` | Enable register error values definitions. |
+| `UNA_AT_TERMINAL_INSTANCE` | `<value>` | Instance of the terminal used to transmit and receive commands. |
 | `UNA_AT_NODE_ADDRESS_LAST` | `<value>` | Last address value of the AT nodes. |

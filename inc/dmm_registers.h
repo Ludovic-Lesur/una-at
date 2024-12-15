@@ -8,7 +8,12 @@
 #ifndef __DMM_REGISTERS_H__
 #define __DMM_REGISTERS_H__
 
+#ifndef UNA_AT_DISABLE_FLAGS_FILE
+#include "una_at_flags.h"
+#endif
 #include "common_registers.h"
+#include "types.h"
+#include "una.h"
 
 /*** DMM REGISTERS structures ***/
 
@@ -41,5 +46,17 @@ typedef enum {
 #define DMM_REGISTER_ANALOG_DATA_1_MASK_VHMI                0xFFFF0000
 
 #define DMM_REGISTER_ANALOG_DATA_2_MASK_VUSB                0x0000FFFF
+
+/*** DMM REGISTERS global variables ***/
+
+#ifdef UNA_AT_USE_REGISTER_ACCESS
+extern const UNA_register_access_t DMM_REGISTER_ACCESS[DMM_REGISTER_ADDRESS_LAST];
+#endif
+#ifdef UNA_AT_USE_REGISTER_ACCESS_TIMEOUT
+extern const uint32_t DMM_REGISTER_ACCESS_TIMEOUT_MS[DMM_REGISTER_ADDRESS_LAST];
+#endif
+#ifdef UNA_AT_USE_REGISTER_ERROR_VALUE
+extern const uint32_t DMM_REGISTER_ERROR_VALUE[DMM_REGISTER_ADDRESS_LAST];
+#endif
 
 #endif /* __DMM_REGISTERS_H__ */

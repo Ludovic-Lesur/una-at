@@ -8,7 +8,12 @@
 #ifndef __SM_REGISTERS_H__
 #define __SM_REGISTERS_H__
 
+#ifndef UNA_AT_DISABLE_FLAGS_FILE
+#include "una_at_flags.h"
+#endif
 #include "common_registers.h"
+#include "types.h"
+#include "una.h"
 
 /*** SM REGISTERS structures ***/
 
@@ -58,5 +63,17 @@ typedef enum {
 #define SM_REGISTER_DIGITAL_DATA_MASK_DIO1      0x0000000C
 #define SM_REGISTER_DIGITAL_DATA_MASK_DIO2      0x00000030
 #define SM_REGISTER_DIGITAL_DATA_MASK_DIO3      0x000000C0
+
+/*** SM REGISTERS global variables ***/
+
+#ifdef UNA_AT_USE_REGISTER_ACCESS
+extern const UNA_register_access_t SM_REGISTER_ACCESS[SM_REGISTER_ADDRESS_LAST];
+#endif
+#ifdef UNA_AT_USE_REGISTER_ACCESS_TIMEOUT
+extern const uint32_t SM_REGISTER_ACCESS_TIMEOUT_MS[SM_REGISTER_ADDRESS_LAST];
+#endif
+#ifdef UNA_AT_USE_REGISTER_ERROR_VALUE
+extern const uint32_t SM_REGISTER_ERROR_VALUE[SM_REGISTER_ADDRESS_LAST];
+#endif
 
 #endif /* __SM_REGISTERS_H__ */

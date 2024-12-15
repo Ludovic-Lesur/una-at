@@ -8,7 +8,12 @@
 #ifndef __LVRM_REGISTERS_H__
 #define __LVRM_REGISTERS_H__
 
+#ifndef UNA_AT_DISABLE_FLAGS_FILE
+#include "una_at_flags.h"
+#endif
 #include "common_registers.h"
+#include "types.h"
+#include "una.h"
 
 /*** LVRM REGISTERS structures ***/
 
@@ -48,5 +53,17 @@ typedef enum {
 #define LVRM_REGISTER_ANALOG_DATA_1_MASK_VOUT                   0xFFFF0000
 
 #define LVRM_REGISTER_ANALOG_DATA_2_MASK_IOUT                   0x0000FFFF
+
+/*** LVRM REGISTERS global variables ***/
+
+#ifdef UNA_AT_USE_REGISTER_ACCESS
+extern const UNA_register_access_t LVRM_REGISTER_ACCESS[LVRM_REGISTER_ADDRESS_LAST];
+#endif
+#ifdef UNA_AT_USE_REGISTER_ACCESS_TIMEOUT
+extern const uint32_t LVRM_REGISTER_ACCESS_TIMEOUT_MS[LVRM_REGISTER_ADDRESS_LAST];
+#endif
+#ifdef UNA_AT_USE_REGISTER_ERROR_VALUE
+extern const uint32_t LVRM_REGISTER_ERROR_VALUE[LVRM_REGISTER_ADDRESS_LAST];
+#endif
 
 #endif /* __LVRM_REGISTERS_H__ */

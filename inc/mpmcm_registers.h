@@ -8,7 +8,12 @@
 #ifndef __MPMCM_REGISTERS_H__
 #define __MPMCM_REGISTERS_H__
 
+#ifndef UNA_AT_DISABLE_FLAGS_FILE
+#include "una_at_flags.h"
+#endif
 #include "common_registers.h"
+#include "types.h"
+#include "una.h"
 
 /*** MPMCM REGISTERS structures ***/
 
@@ -97,5 +102,17 @@ typedef enum {
 
 #define MPMCM_REGISTER_MASK_ACTIVE_ENERGY                               0x0000FFFF
 #define MPMCM_REGISTER_MASK_APPARENT_ENERGY                             0xFFFF0000
+
+/*** MPMCM REGISTERS global variables ***/
+
+#ifdef UNA_AT_USE_REGISTER_ACCESS
+extern const UNA_register_access_t MPMCM_REGISTER_ACCESS[MPMCM_REGISTER_ADDRESS_LAST];
+#endif
+#ifdef UNA_AT_USE_REGISTER_ACCESS_TIMEOUT
+extern const uint32_t MPMCM_REGISTER_ACCESS_TIMEOUT_MS[MPMCM_REGISTER_ADDRESS_LAST];
+#endif
+#ifdef UNA_AT_USE_REGISTER_ERROR_VALUE
+extern const uint32_t MPMCM_REGISTER_ERROR_VALUE[MPMCM_REGISTER_ADDRESS_LAST];
+#endif
 
 #endif /* __MPMCM_REGISTERS_H__ */
