@@ -27,26 +27,59 @@ typedef enum {
     UHFM_REGISTER_ADDRESS_STATUS_1,
     UHFM_REGISTER_ADDRESS_CONTROL_1,
     UHFM_REGISTER_ADDRESS_ANALOG_DATA_1,
-    UHFM_REGISTER_ADDRESS_SIGFOX_EP_ID,
-    UHFM_REGISTER_ADDRESS_SIGFOX_EP_KEY_0,
-    UHFM_REGISTER_ADDRESS_SIGFOX_EP_KEY_1,
-    UHFM_REGISTER_ADDRESS_SIGFOX_EP_KEY_2,
-    UHFM_REGISTER_ADDRESS_SIGFOX_EP_KEY_3,
-    UHFM_REGISTER_ADDRESS_SIGFOX_UL_PAYLOAD_0,
-    UHFM_REGISTER_ADDRESS_SIGFOX_UL_PAYLOAD_1,
-    UHFM_REGISTER_ADDRESS_SIGFOX_UL_PAYLOAD_2,
-    UHFM_REGISTER_ADDRESS_SIGFOX_DL_PAYLOAD_0,
-    UHFM_REGISTER_ADDRESS_SIGFOX_DL_PAYLOAD_1,
-    UHFM_REGISTER_ADDRESS_SIGFOX_DL_PHY_CONTENT_0,
-    UHFM_REGISTER_ADDRESS_SIGFOX_DL_PHY_CONTENT_1,
-    UHFM_REGISTER_ADDRESS_SIGFOX_DL_PHY_CONTENT_2,
-    UHFM_REGISTER_ADDRESS_SIGFOX_DL_PHY_CONTENT_3,
+    UHFM_REGISTER_ADDRESS_EP_ID,
+    UHFM_REGISTER_ADDRESS_EP_KEY_0,
+    UHFM_REGISTER_ADDRESS_EP_KEY_1,
+    UHFM_REGISTER_ADDRESS_EP_KEY_2,
+    UHFM_REGISTER_ADDRESS_EP_KEY_3,
+    UHFM_REGISTER_ADDRESS_UL_PAYLOAD_0,
+    UHFM_REGISTER_ADDRESS_UL_PAYLOAD_1,
+    UHFM_REGISTER_ADDRESS_UL_PAYLOAD_2,
+    UHFM_REGISTER_ADDRESS_DL_PAYLOAD_0,
+    UHFM_REGISTER_ADDRESS_DL_PAYLOAD_1,
+    UHFM_REGISTER_ADDRESS_DL_PHY_CONTENT_0,
+    UHFM_REGISTER_ADDRESS_DL_PHY_CONTENT_1,
+    UHFM_REGISTER_ADDRESS_DL_PHY_CONTENT_2,
+    UHFM_REGISTER_ADDRESS_DL_PHY_CONTENT_3,
     UHFM_REGISTER_ADDRESS_RADIO_TEST_0,
     UHFM_REGISTER_ADDRESS_RADIO_TEST_1,
     UHFM_REGISTER_ADDRESS_LAST,
 } UHFM_register_address_t;
 
+/*!******************************************************************
+ * \enum UHFM_ul_message_type_t
+ * \brief Uplink message types.
+ *******************************************************************/
+typedef enum {
+    UHFM_UL_MESSAGE_TYPE_EMPTY = 0,
+    UHFM_UL_MESSAGE_TYPE_BIT0,
+    UHFM_UL_MESSAGE_TYPE_BIT1,
+    UHFM_UL_MESSAGE_TYPE_BYTE_ARRAY,
+    UHFM_UL_MESSAGE_TYPE_LAST
+} UHFM_ul_message_type_t;
+
+/*!******************************************************************
+ * \union UHFM_ul_message_status_t
+ * \brief Uplink message status bitfield.
+ *******************************************************************/
+typedef union {
+    struct {
+        unsigned ul_frame_1 :1;
+        unsigned ul_frame_2 :1;
+        unsigned ul_frame_3 :1;
+        unsigned dl_frame :1;
+        unsigned dl_conf_frame :1;
+        unsigned network_error :1;
+        unsigned execution_error :1;
+    } field;
+    unsigned all;
+} UHFM_ul_message_status_t;
+
 /*** UHFM REGISTERS macros ***/
+
+#define UHFM_EP_ID_SIZE_BYTES                           4
+#define UHFM_UL_PAYLOAD_MAX_SIZE_BYTES                  12
+#define UHFM_DL_PAYLOAD_SIZE_BYTES                      8
 
 #define UHFM_NUMBER_OF_SPECIFIC_REGISTERS               (UHFM_REGISTER_ADDRESS_LAST - COMMON_REGISTER_ADDRESS_LAST)
 
