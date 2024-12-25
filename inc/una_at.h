@@ -18,7 +18,7 @@
 
 /*** UNA AT macros ***/
 
-#define UNA_AT_DEFAULT_TIMEOUT_MS   500
+#define UNA_AT_DEFAULT_TIMEOUT_MS   200
 
 /*** UNA AT structures ***/
 

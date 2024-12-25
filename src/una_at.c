@@ -39,7 +39,7 @@
 #define UNA_AT_COMMAND_END              "\r"
 
 #define UNA_AT_REPLY_BUFFER_SIZE_BYTES  128
-#define UNA_AT_REPLY_BUFFER_DEPTH       16
+#define UNA_AT_REPLY_BUFFER_DEPTH       4
 #define UNA_AT_REPLY_OK                 "OK"
 #define UNA_AT_REPLY_ERROR              "ERROR"
 #define UNA_AT_REPLY_END                STRING_CHAR_CR
@@ -51,7 +51,7 @@
 /*******************************************************************/
 typedef struct {
     volatile char_t buffer[UNA_AT_REPLY_BUFFER_SIZE_BYTES];
-    volatile uint8_t size;
+    volatile uint32_t size;
     volatile uint8_t line_end_flag;
     PARSER_context_t parser;
 } UNA_AT_reply_buffer_t;
@@ -78,7 +78,7 @@ static UNA_AT_context_t at_bus_ctx;
 /*******************************************************************/
 static void _UNA_AT_rx_irq_callback(uint8_t data) {
     // Read current index.
-    uint8_t idx = at_bus_ctx.reply[at_bus_ctx.reply_write_idx].size;
+    uint32_t idx = at_bus_ctx.reply[at_bus_ctx.reply_write_idx].size;
     // Check ending characters.
     if (data == UNA_AT_REPLY_END) {
         // Set flag on current buffer.
@@ -91,16 +91,48 @@ static void _UNA_AT_rx_irq_callback(uint8_t data) {
         // Store incoming byte.
         at_bus_ctx.reply[at_bus_ctx.reply_write_idx].buffer[idx] = (char_t) data;
         // Manage index.
-        idx = (uint8_t) ((idx + 1) % UNA_AT_REPLY_BUFFER_SIZE_BYTES);
+        idx = (uint32_t) ((idx + 1) % UNA_AT_REPLY_BUFFER_SIZE_BYTES);
         at_bus_ctx.reply[at_bus_ctx.reply_write_idx].size = idx;
     }
 }
 #endif
 
+/*******************************************************************/
+static UNA_AT_status_t _UNA_AT_terminal_tx_buffer_add_register(uint32_t reg_value) {
+    // Local variables.
+    UNA_AT_status_t status = UNA_AT_SUCCESS;
+    TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
+    uint8_t byte = 0;
+    uint8_t idx = 0;
+    uint8_t first_non_zero_found = 0;
+    // Convert 32-bits value to byte array.
+    for (idx = 0; idx < UNA_REGISTER_SIZE_BYTES; idx++) {
+        // Compute byte.
+        byte = (uint8_t) ((reg_value >> ((UNA_REGISTER_SIZE_BYTES - 1 - idx) << 3)) & 0xFF);
+        // Update flag.
+        if (byte != 0) {
+            first_non_zero_found = 1;
+        }
+        // Check flag and index.
+        if ((first_non_zero_found != 0) || (idx == (UNA_REGISTER_SIZE_BYTES - 1))) {
+            // Convert byte.
+            terminal_status = TERMINAL_tx_buffer_add_integer(UNA_AT_TERMINAL_INSTANCE, (int32_t) byte, STRING_FORMAT_HEXADECIMAL, 0);
+            TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
+        }
+    }
+errors:
+    return status;
+}
+
 #ifdef UNA_AT_MODE_MASTER
 /*******************************************************************/
 static void _UNA_AT_flush_reply(uint8_t reply_index) {
+    // Local variables.
+    uint32_t idx = 0;
     // Flush buffer.
+    for (idx = 0; idx < UNA_AT_REPLY_BUFFER_SIZE_BYTES; idx++) {
+        at_bus_ctx.reply[reply_index].buffer[idx] = STRING_CHAR_NULL;
+    }
     at_bus_ctx.reply[reply_index].size = 0;
     // Reset flag.
     at_bus_ctx.reply[reply_index].line_end_flag = 0;
@@ -116,10 +148,10 @@ static void _UNA_AT_flush_reply(uint8_t reply_index) {
 /*******************************************************************/
 static void _UNA_AT_flush_replies(void) {
     // Local variables.
-    uint8_t rep_idx = 0;
+    uint8_t idx = 0;
     // Reset replies buffers.
-    for (rep_idx = 0; rep_idx < UNA_AT_REPLY_BUFFER_DEPTH; rep_idx++) {
-        _UNA_AT_flush_reply(rep_idx);
+    for (idx = 0; idx < UNA_AT_REPLY_BUFFER_DEPTH; idx++) {
+        _UNA_AT_flush_reply(idx);
     }
     // Reset index and count.
     at_bus_ctx.reply_write_idx = 0;
@@ -298,6 +330,8 @@ UNA_AT_status_t UNA_AT_send_command(UNA_command_parameters_t* command_params) {
     UNA_AT_status_t status = UNA_AT_SUCCESS;
     TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
     // Add command.
+    terminal_status = TERMINAL_flush_tx_buffer(UNA_AT_TERMINAL_INSTANCE);
+    TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
     terminal_status = TERMINAL_tx_buffer_add_string(UNA_AT_TERMINAL_INSTANCE, (command_params->command));
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
     // Send command.
@@ -324,20 +358,22 @@ UNA_AT_status_t UNA_AT_write_register(UNA_access_parameters_t* write_params, uin
     (write_status->all) = 0;
     (write_status->type) = UNA_ACCESS_TYPE_WRITE;
     // Build write command.
+    terminal_status = TERMINAL_flush_tx_buffer(UNA_AT_TERMINAL_INSTANCE);
+    TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
     terminal_status = TERMINAL_tx_buffer_add_string(UNA_AT_TERMINAL_INSTANCE, UNA_AT_COMMAND_WRITE_REGISTER);
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
-    terminal_status = TERMINAL_tx_buffer_add_integer(UNA_AT_TERMINAL_INSTANCE, (uint32_t) (write_params->reg_addr), STRING_FORMAT_HEXADECIMAL, 0);
+    terminal_status = TERMINAL_tx_buffer_add_integer(UNA_AT_TERMINAL_INSTANCE, (int32_t) (write_params->reg_addr), STRING_FORMAT_HEXADECIMAL, 0);
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
     terminal_status = TERMINAL_tx_buffer_add_string(UNA_AT_TERMINAL_INSTANCE, UNA_AT_COMMAND_SEPARATOR);
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
-    terminal_status = TERMINAL_tx_buffer_add_integer(UNA_AT_TERMINAL_INSTANCE, (int32_t) reg_value, STRING_FORMAT_HEXADECIMAL, 0);
-    TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
+    status = _UNA_AT_terminal_tx_buffer_add_register(reg_value);
+    if (status != UNA_AT_SUCCESS) goto errors;
     // Add mask if needed.
     if (reg_mask != UNA_REGISTER_MASK_ALL) {
         terminal_status = TERMINAL_tx_buffer_add_string(UNA_AT_TERMINAL_INSTANCE, UNA_AT_COMMAND_SEPARATOR);
         TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
-        terminal_status = TERMINAL_tx_buffer_add_integer(UNA_AT_TERMINAL_INSTANCE, (int32_t) reg_mask, STRING_FORMAT_HEXADECIMAL, 0);
-        TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
+        status = _UNA_AT_terminal_tx_buffer_add_register(reg_mask);
+        if (status != UNA_AT_SUCCESS) goto errors;
     }
     // Send command.
     status = _UNA_AT_send(write_params->node_addr);
@@ -365,6 +401,8 @@ UNA_AT_status_t UNA_AT_read_register(UNA_access_parameters_t* read_params, uint3
     (read_status->all) = 0;
     (read_status->type) = UNA_ACCESS_TYPE_READ;
     // Build read command.
+    terminal_status = TERMINAL_flush_tx_buffer(UNA_AT_TERMINAL_INSTANCE);
+    TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
     terminal_status = TERMINAL_tx_buffer_add_string(UNA_AT_TERMINAL_INSTANCE, UNA_AT_COMMAND_READ_REGISTER);
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
     terminal_status = TERMINAL_tx_buffer_add_integer(UNA_AT_TERMINAL_INSTANCE, (uint32_t) (read_params->reg_addr), STRING_FORMAT_HEXADECIMAL, 0);
@@ -401,7 +439,7 @@ UNA_AT_status_t UNA_AT_scan(UNA_node_t* nodes_list, uint8_t nodes_list_size, uin
     read_params.reply_params.timeout_ms = UNA_AT_DEFAULT_TIMEOUT_MS;
     read_params.reply_params.type = UNA_REPLY_TYPE_VALUE;
     // Loop on all addresses.
-    for (node_addr = 0; node_addr <= UNA_AT_NODE_ADDRESS_LAST; node_addr++) {
+    for (node_addr = 0; node_addr < UNA_NODE_ADDRESS_R4S8CR_START; node_addr++) {
         // Update address.
         read_params.node_addr = node_addr;
         // Read UNA_AT_ID register.
