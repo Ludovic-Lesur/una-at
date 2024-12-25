@@ -54,6 +54,19 @@ typedef enum {
     MPMCM_REGISTER_ADDRESS_LAST,
 } MPMCM_register_address_t;
 
+/*!******************************************************************
+ * \enum MPMCM_channel_index_t
+ * \brief MPMCM measurement channels list.
+ *******************************************************************/
+typedef enum {
+    MPMCM_CHANNEL_INDEX_ACI0 = 0,
+    MPMCM_CHANNEL_INDEX_ACI1,
+    MPMCM_CHANNEL_INDEX_ACI2,
+    MPMCM_CHANNEL_INDEX_ACI3,
+    MPMCM_CHANNEL_INDEX_TIC,
+    MPMCM_CHANNEL_INDEX_LAST
+} MPMCM_channel_index_t;
+
 /*** MPMCM REGISTERS macros ***/
 
 #define MPMCM_NUMBER_OF_SPECIFIC_REGISTERS                              (MPMCM_REGISTER_ADDRESS_LAST - COMMON_REGISTER_ADDRESS_LAST)
