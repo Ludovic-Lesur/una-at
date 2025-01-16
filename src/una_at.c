@@ -30,12 +30,18 @@
 /*** UNA AT local macros ***/
 
 #ifdef UNA_AT_MODE_MASTER
+#define UNA_AT_COMMAND_SEPARATOR        ","
+#endif
+#ifdef UNA_AT_MODE_SLAVE
+#define UNA_AT_COMMAND_SEPARATOR        STRING_CHAR_COMMA
+#endif
+
+#ifdef UNA_AT_MODE_MASTER
 #define UNA_AT_REPLY_PARSING_DELAY_MS   20
 #define UNA_AT_SEQUENCE_TIMEOUT_MS      120000
 
 #define UNA_AT_COMMAND_WRITE_REGISTER   "AT$W="
 #define UNA_AT_COMMAND_READ_REGISTER    "AT$R="
-#define UNA_AT_COMMAND_SEPARATOR        ","
 #define UNA_AT_COMMAND_END              "\r"
 
 #define UNA_AT_REPLY_BUFFER_SIZE_BYTES  128
@@ -43,6 +49,9 @@
 #define UNA_AT_REPLY_OK                 "OK"
 #define UNA_AT_REPLY_ERROR              "ERROR"
 #define UNA_AT_REPLY_END                STRING_CHAR_CR
+#endif
+#ifdef UNA_AT_MODE_SLAVE
+#define UNA_AT_REPLY_DELAY_MS           20
 #endif
 
 /*** UNA AT local structures ***/
@@ -64,13 +73,40 @@ typedef struct {
     volatile uint8_t reply_write_idx;
     volatile uint8_t reply_read_idx;
 #endif
+#ifdef UNA_AT_MODE_SLAVE
+    volatile uint8_t at_process_flag;
+    PARSER_context_t* at_parser_ptr;
+    UNA_AT_process_cb_t process_callback;
+    UNA_AT_write_register_cb_t write_register_callback;
+    UNA_AT_read_register_cb_t read_register_callback;
+#endif
 } UNA_AT_context_t;
+
+/*** UNA_AT local functions declaration ***/
+
+/*******************************************************************/
+static AT_status_t _UNA_AT_write_register_callback(void);
+static AT_status_t _UNA_AT_read_register_callback(void);
 
 /*** AT local global variables ***/
 
-#ifdef UNA_AT_MODE_MASTER
-static UNA_AT_context_t at_bus_ctx;
+#ifdef UNA_AT_MODE_SLAVE
+static const AT_command_t UNA_AT_COMMANDS_LIST[] = {
+    {
+        .syntax = "$W=",
+        .parameters = "<addr[hex],data[hex]>",
+        .description = "Write node register",
+        .callback = &_UNA_AT_write_register_callback
+    },
+    {
+        .syntax = "$R=",
+        .parameters = "<addr>[hex]",
+        .description = "Read node register",
+        .callback = &_UNA_AT_read_register_callback
+    }
+};
 #endif
+static UNA_AT_context_t una_at_ctx;
 
 /*** AT local functions ***/
 
@@ -78,30 +114,49 @@ static UNA_AT_context_t at_bus_ctx;
 /*******************************************************************/
 static void _UNA_AT_rx_irq_callback(uint8_t data) {
     // Read current index.
-    uint32_t idx = at_bus_ctx.reply[at_bus_ctx.reply_write_idx].size;
+    uint32_t idx = una_at_ctx.reply[una_at_ctx.reply_write_idx].size;
     // Check ending characters.
     if (data == UNA_AT_REPLY_END) {
         // Set flag on current buffer.
-        at_bus_ctx.reply[at_bus_ctx.reply_write_idx].buffer[idx] = STRING_CHAR_NULL;
-        at_bus_ctx.reply[at_bus_ctx.reply_write_idx].line_end_flag = 1;
+        una_at_ctx.reply[una_at_ctx.reply_write_idx].buffer[idx] = STRING_CHAR_NULL;
+        una_at_ctx.reply[una_at_ctx.reply_write_idx].line_end_flag = 1;
         // Switch buffer.
-        at_bus_ctx.reply_write_idx = (uint8_t) ((at_bus_ctx.reply_write_idx + 1) % UNA_AT_REPLY_BUFFER_DEPTH);
+        una_at_ctx.reply_write_idx = (uint8_t) ((una_at_ctx.reply_write_idx + 1) % UNA_AT_REPLY_BUFFER_DEPTH);
     }
     else {
         // Store incoming byte.
-        at_bus_ctx.reply[at_bus_ctx.reply_write_idx].buffer[idx] = (char_t) data;
+        una_at_ctx.reply[una_at_ctx.reply_write_idx].buffer[idx] = (char_t) data;
         // Manage index.
         idx = (uint32_t) ((idx + 1) % UNA_AT_REPLY_BUFFER_SIZE_BYTES);
-        at_bus_ctx.reply[at_bus_ctx.reply_write_idx].size = idx;
+        una_at_ctx.reply[una_at_ctx.reply_write_idx].size = idx;
+    }
+}
+#endif
+
+#ifdef UNA_AT_MODE_SLAVE
+/*******************************************************************/
+static void _UNA_AT_at_process_callback(void) {
+    // Set local flag.
+    una_at_ctx.at_process_flag = 1;
+    // Ask for processing.
+    if (una_at_ctx.process_callback != NULL) {
+        una_at_ctx.process_callback();
     }
 }
 #endif
 
 /*******************************************************************/
-static UNA_AT_status_t _UNA_AT_terminal_tx_buffer_add_register(uint32_t reg_value) {
+#ifdef UNA_AT_MODE_MASTER
+static UNA_AT_status_t _UNA_AT_tx_buffer_add_register(uint32_t reg_value) {
+#endif
+#ifdef UNA_AT_MODE_SLAVE
+static void _UNA_AT_tx_buffer_add_register(uint32_t reg_value) {
+#endif
     // Local variables.
+#ifdef UNA_AT_MODE_MASTER
     UNA_AT_status_t status = UNA_AT_SUCCESS;
     TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
+#endif
     uint8_t byte = 0;
     uint8_t idx = 0;
     uint8_t first_non_zero_found = 0;
@@ -116,12 +171,19 @@ static UNA_AT_status_t _UNA_AT_terminal_tx_buffer_add_register(uint32_t reg_valu
         // Check flag and index.
         if ((first_non_zero_found != 0) || (idx == (UNA_REGISTER_SIZE_BYTES - 1))) {
             // Convert byte.
+#ifdef UNA_AT_MODE_MASTER
             terminal_status = TERMINAL_tx_buffer_add_integer(UNA_AT_TERMINAL_INSTANCE, (int32_t) byte, STRING_FORMAT_HEXADECIMAL, 0);
             TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
+#endif
+#ifdef UNA_AT_MODE_SLAVE
+            AT_reply_add_integer((int32_t) byte, STRING_FORMAT_HEXADECIMAL, 0);
+#endif
         }
     }
+#ifdef UNA_AT_MODE_MASTER
 errors:
     return status;
+#endif
 }
 
 #ifdef UNA_AT_MODE_MASTER
@@ -131,16 +193,16 @@ static void _UNA_AT_flush_reply(uint8_t reply_index) {
     uint32_t idx = 0;
     // Flush buffer.
     for (idx = 0; idx < UNA_AT_REPLY_BUFFER_SIZE_BYTES; idx++) {
-        at_bus_ctx.reply[reply_index].buffer[idx] = STRING_CHAR_NULL;
+        una_at_ctx.reply[reply_index].buffer[idx] = STRING_CHAR_NULL;
     }
-    at_bus_ctx.reply[reply_index].size = 0;
+    una_at_ctx.reply[reply_index].size = 0;
     // Reset flag.
-    at_bus_ctx.reply[reply_index].line_end_flag = 0;
+    una_at_ctx.reply[reply_index].line_end_flag = 0;
     // Reset parser.
-    at_bus_ctx.reply[reply_index].parser.buffer = (char_t*) at_bus_ctx.reply[reply_index].buffer;
-    at_bus_ctx.reply[reply_index].parser.buffer_size = 0;
-    at_bus_ctx.reply[reply_index].parser.separator_index = 0;
-    at_bus_ctx.reply[reply_index].parser.start_index = 0;
+    una_at_ctx.reply[reply_index].parser.buffer = (char_t*) una_at_ctx.reply[reply_index].buffer;
+    una_at_ctx.reply[reply_index].parser.buffer_size = 0;
+    una_at_ctx.reply[reply_index].parser.separator_index = 0;
+    una_at_ctx.reply[reply_index].parser.start_index = 0;
 }
 #endif
 
@@ -154,8 +216,8 @@ static void _UNA_AT_flush_replies(void) {
         _UNA_AT_flush_reply(idx);
     }
     // Reset index and count.
-    at_bus_ctx.reply_write_idx = 0;
-    at_bus_ctx.reply_read_idx = 0;
+    una_at_ctx.reply_write_idx = 0;
+    una_at_ctx.reply_read_idx = 0;
 }
 #endif
 
@@ -194,25 +256,25 @@ static UNA_AT_status_t _UNA_AT_wait_reply(UNA_reply_parameters_t* reply_params, 
         reply_time_ms += UNA_AT_REPLY_PARSING_DELAY_MS;
         sequence_time_ms += UNA_AT_REPLY_PARSING_DELAY_MS;
         // Check write index.
-        if (at_bus_ctx.reply_write_idx != at_bus_ctx.reply_read_idx) {
+        if (una_at_ctx.reply_write_idx != una_at_ctx.reply_read_idx) {
             // Check line end flag.
-            if (at_bus_ctx.reply[at_bus_ctx.reply_read_idx].line_end_flag != 0) {
+            if (una_at_ctx.reply[una_at_ctx.reply_read_idx].line_end_flag != 0) {
                 // Increment parsing count.
                 reply_count++;
                 // Reset time and flag.
                 reply_time_ms = 0;
-                at_bus_ctx.reply[at_bus_ctx.reply_read_idx].line_end_flag = 0;
+                una_at_ctx.reply[una_at_ctx.reply_read_idx].line_end_flag = 0;
                 // Update buffer length.
-                at_bus_ctx.reply[at_bus_ctx.reply_read_idx].parser.buffer_size = at_bus_ctx.reply[at_bus_ctx.reply_read_idx].size;
+                una_at_ctx.reply[una_at_ctx.reply_read_idx].parser.buffer_size = una_at_ctx.reply[una_at_ctx.reply_read_idx].size;
                 // Parse reply.
                 switch (reply_params->type) {
                 case UNA_REPLY_TYPE_OK:
                     // Compare to reference string.
-                    parser_status = PARSER_compare(&at_bus_ctx.reply[at_bus_ctx.reply_read_idx].parser, PARSER_MODE_STRICT, UNA_AT_REPLY_OK);
+                    parser_status = PARSER_compare(&una_at_ctx.reply[una_at_ctx.reply_read_idx].parser, PARSER_MODE_STRICT, UNA_AT_REPLY_OK);
                     break;
                 case UNA_REPLY_TYPE_VALUE:
                     // Parse register.
-                    parser_status = SWREG_parse_register(&at_bus_ctx.reply[at_bus_ctx.reply_read_idx].parser, STRING_CHAR_NULL, reg_value);
+                    parser_status = SWREG_parse_register(&una_at_ctx.reply[una_at_ctx.reply_read_idx].parser, STRING_CHAR_NULL, reg_value);
                     break;
                 default:
                     status = UNA_AT_ERROR_REPLY_TYPE;
@@ -225,7 +287,7 @@ static UNA_AT_status_t _UNA_AT_wait_reply(UNA_reply_parameters_t* reply_params, 
                     break;
                 }
                 // Check error.
-                parser_status = PARSER_compare(&at_bus_ctx.reply[at_bus_ctx.reply_read_idx].parser, PARSER_MODE_HEADER, UNA_AT_REPLY_ERROR);
+                parser_status = PARSER_compare(&una_at_ctx.reply[una_at_ctx.reply_read_idx].parser, PARSER_MODE_HEADER, UNA_AT_REPLY_ERROR);
                 if (parser_status == PARSER_SUCCESS) {
                     // Update output data.
                     (reply_status->error_received) = 1;
@@ -233,8 +295,8 @@ static UNA_AT_status_t _UNA_AT_wait_reply(UNA_reply_parameters_t* reply_params, 
                 }
             }
             // Update read index.
-            _UNA_AT_flush_reply(at_bus_ctx.reply_read_idx);
-            at_bus_ctx.reply_read_idx = (uint8_t) ((at_bus_ctx.reply_read_idx + 1) % UNA_AT_REPLY_BUFFER_DEPTH);
+            _UNA_AT_flush_reply(una_at_ctx.reply_read_idx);
+            una_at_ctx.reply_read_idx = (uint8_t) ((una_at_ctx.reply_read_idx + 1) % UNA_AT_REPLY_BUFFER_DEPTH);
         }
         // Exit if timeout.
         if (reply_time_ms > (reply_params->timeout_ms)) {
@@ -280,23 +342,131 @@ errors:
 }
 #endif
 
+#ifdef UNA_AT_MODE_SLAVE
+/*******************************************************************/
+static AT_status_t _UNA_AT_write_register_callback(void) {
+    // Local variables.
+    AT_status_t status = AT_SUCCESS;
+    PARSER_status_t parser_status = PARSER_SUCCESS;
+    uint32_t reg_addr = 0;
+    uint32_t reg_value = 0;
+    uint32_t reg_mask = 0;
+    // Delay to ensure that the master node has switched to RX.
+    UNA_AT_HW_delay_milliseconds(UNA_AT_REPLY_DELAY_MS);
+    // Read address parameter.
+    parser_status = SWREG_parse_register(una_at_ctx.at_parser_ptr, UNA_AT_COMMAND_SEPARATOR, &reg_addr);
+    PARSER_exit_error(AT_ERROR_BASE_PARSER);
+    // First try with 3 parameters.
+    parser_status = SWREG_parse_register(una_at_ctx.at_parser_ptr, UNA_AT_COMMAND_SEPARATOR, &reg_value);
+    if (parser_status == PARSER_SUCCESS) {
+        // Try parsing register mask parameter.
+        parser_status = SWREG_parse_register(una_at_ctx.at_parser_ptr, STRING_CHAR_NULL, &reg_mask);
+        PARSER_exit_error(AT_ERROR_BASE_PARSER);
+    }
+    else {
+        // Try with only 2 parameters.
+        parser_status = SWREG_parse_register(una_at_ctx.at_parser_ptr, STRING_CHAR_NULL, &reg_value);
+        PARSER_exit_error(AT_ERROR_BASE_PARSER);
+        // Perform full write operation since mask is not given.
+        reg_mask = UNA_REGISTER_MASK_ALL;
+    }
+    // Write register.
+    if (una_at_ctx.write_register_callback != NULL) {
+        // Execute write callback.
+        status = una_at_ctx.write_register_callback((uint8_t) reg_addr, reg_value, reg_mask);
+        if (status != AT_SUCCESS) goto errors;
+    }
+    else {
+        status = AT_ERROR_COMMAND_EXECUTION;
+        goto errors;
+    }
+errors:
+    return status;
+}
+#endif
+
+#ifdef UNA_AT_MODE_SLAVE
+/*******************************************************************/
+static AT_status_t _UNA_AT_read_register_callback(void) {
+    // Local variables.
+    AT_status_t status = AT_SUCCESS;
+    PARSER_status_t parser_status = PARSER_SUCCESS;
+    uint32_t reg_addr = 0;
+    uint32_t reg_value = 0;
+    // Delay to ensure that the master node has switched to RX.
+    UNA_AT_HW_delay_milliseconds(UNA_AT_REPLY_DELAY_MS);
+    // Read address parameter.
+    parser_status = SWREG_parse_register(una_at_ctx.at_parser_ptr, STRING_CHAR_NULL, &reg_addr);
+    PARSER_exit_error(AT_ERROR_BASE_PARSER);
+    // Read register.
+    if (una_at_ctx.read_register_callback != NULL) {
+        // Execute read callback.
+        status = una_at_ctx.read_register_callback((uint8_t) reg_addr, &reg_value);
+        if (status != AT_SUCCESS) goto errors;
+    }
+    else {
+        status = AT_ERROR_COMMAND_EXECUTION;
+        goto errors;
+    }
+    // Send reply.
+    _UNA_AT_tx_buffer_add_register(reg_value);
+    AT_send_reply();
+errors:
+    return status;
+}
+#endif
+
 /*** AT functions ***/
 
 /*******************************************************************/
-UNA_AT_status_t UNA_AT_init(uint32_t baud_rate) {
+UNA_AT_status_t UNA_AT_init(UNA_AT_configuration_t* configuration) {
     // Local variables.
     UNA_AT_status_t status = UNA_AT_SUCCESS;
 #ifdef UNA_AT_MODE_MASTER
     TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
+#endif
+#ifdef UNA_AT_MODE_SLAVE
+    AT_status_t at_status = AT_SUCCESS;
+    AT_configuration_t at_config;
+    uint8_t idx = 0;
+#endif
+    // Check parameter.
+    if (configuration == NULL) {
+        status = UNA_AT_ERROR_NULL_PARAMETER;
+        goto errors;
+    }
     // Init context.
+#ifdef UNA_AT_MODE_MASTER
     _UNA_AT_flush_replies();
+#endif
+#ifdef UNA_AT_MODE_SLAVE
+    una_at_ctx.at_process_flag = 0;
+    una_at_ctx.process_callback = (configuration->process_callback);
+    una_at_ctx.write_register_callback = (configuration->write_register_callback);
+    una_at_ctx.read_register_callback = (configuration->read_register_callback);
+#endif
+    // Init low level interface.
+#ifdef UNA_AT_MODE_MASTER
     // Init bus terminal.
     terminal_status = TERMINAL_open(UNA_AT_TERMINAL_INSTANCE, baud_rate, &_UNA_AT_rx_irq_callback);
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
-errors:
-#else
-    UNUSED(baud_rate);
 #endif
+#ifdef UNA_AT_MODE_SLAVE
+    // Init AT receiver.
+    at_config.process_callback = &_UNA_AT_at_process_callback;
+    at_config.terminal_instance = UNA_AT_TERMINAL_INSTANCE;
+    at_status = AT_init(&at_config, &(una_at_ctx.at_parser_ptr));
+    AT_exit_error(UNA_AT_ERROR_BASE_AT);
+    // Register commands.
+    for (idx = 0; idx < (sizeof(UNA_AT_COMMANDS_LIST) / sizeof(AT_command_t)); idx++) {
+        at_status = AT_register_command(&(UNA_AT_COMMANDS_LIST[idx]));
+        AT_exit_error(UNA_AT_ERROR_BASE_AT);
+    }
+#ifdef UNA_AT_CUSTOM_COMMANDS
+    *(configuration->parser_context_ptr) = una_at_ctx.at_parser_ptr;
+#endif
+#endif
+errors:
     return status;
 }
 
@@ -306,22 +476,30 @@ UNA_AT_status_t UNA_AT_de_init(void) {
     UNA_AT_status_t status = UNA_AT_SUCCESS;
 #ifdef UNA_AT_MODE_MASTER
     TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
+#endif
+#ifdef UNA_AT_MODE_SLAVE
+    AT_status_t at_status = AT_SUCCESS;
+    uint8_t idx = 0;
+#endif
+    // Release low level interface.
+#ifdef UNA_AT_MODE_MASTER
     // Release bus terminal.
     terminal_status = TERMINAL_close(UNA_AT_TERMINAL_INSTANCE);
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
-errors:
 #endif
-    return status;
-}
-
 #ifdef UNA_AT_MODE_SLAVE
-/*******************************************************************/
-UNA_AT_status_t UNA_AT_process(void) {
-    // Local variables.
-    UNA_AT_status_t status = UNA_AT_SUCCESS;
+    // Unregister commands.
+    for (idx = 0; idx < (sizeof(UNA_AT_COMMANDS_LIST) / sizeof(AT_command_t)); idx++) {
+        at_status = AT_unregister_command(&(UNA_AT_COMMANDS_LIST[idx]));
+        AT_exit_error(UNA_AT_ERROR_BASE_AT);
+    }
+    // Init AT receiver.
+    at_status = AT_de_init();
+    AT_exit_error(UNA_AT_ERROR_BASE_AT);
+#endif
+errors:
     return status;
 }
-#endif
 
 #ifdef UNA_AT_MODE_MASTER
 /*******************************************************************/
@@ -366,13 +544,13 @@ UNA_AT_status_t UNA_AT_write_register(UNA_access_parameters_t* write_params, uin
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
     terminal_status = TERMINAL_tx_buffer_add_string(UNA_AT_TERMINAL_INSTANCE, UNA_AT_COMMAND_SEPARATOR);
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
-    status = _UNA_AT_terminal_tx_buffer_add_register(reg_value);
+    status = _UNA_AT_tx_buffer_add_register(reg_value);
     if (status != UNA_AT_SUCCESS) goto errors;
     // Add mask if needed.
     if (reg_mask != UNA_REGISTER_MASK_ALL) {
         terminal_status = TERMINAL_tx_buffer_add_string(UNA_AT_TERMINAL_INSTANCE, UNA_AT_COMMAND_SEPARATOR);
         TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
-        status = _UNA_AT_terminal_tx_buffer_add_register(reg_mask);
+        status = _UNA_AT_tx_buffer_add_register(reg_mask);
         if (status != UNA_AT_SUCCESS) goto errors;
     }
     // Send command.
@@ -459,6 +637,53 @@ UNA_AT_status_t UNA_AT_scan(UNA_node_t* nodes_list, uint8_t nodes_list_size, uin
         // Check index.
         if ((*nodes_count) >= nodes_list_size) break;
     }
+errors:
+    return status;
+}
+#endif
+
+#ifdef UNA_AT_MODE_SLAVE
+/*******************************************************************/
+UNA_AT_status_t UNA_AT_process(void) {
+    // Local variables.
+    UNA_AT_status_t status = UNA_AT_SUCCESS;
+    AT_status_t at_status = AT_SUCCESS;
+    // Check AT flag.
+    if (una_at_ctx.at_process_flag != 0) {
+        // Clear flag.
+        una_at_ctx.at_process_flag = 0;
+        // Process AT parser.
+        at_status = AT_process();
+        AT_exit_error(UNA_AT_ERROR_BASE_AT);
+    }
+errors:
+    return status;
+}
+#endif
+
+#if ((defined UNA_AT_MODE_SLAVE) && (defined UNA_AT_CUSTOM_COMMANDS))
+/*******************************************************************/
+UNA_AT_status_t UNA_AT_register_command(const AT_command_t* command) {
+    // Local variables.
+    UNA_AT_status_t status = UNA_AT_SUCCESS;
+    AT_status_t at_status = AT_SUCCESS;
+    // Register command.
+    at_status = AT_register_command(command);
+    AT_exit_error(UNA_AT_ERROR_BASE_AT);
+errors:
+    return status;
+}
+#endif
+
+#if ((defined UNA_AT_MODE_SLAVE) && (defined UNA_AT_CUSTOM_COMMANDS))
+/*******************************************************************/
+UNA_AT_status_t UNA_AT_unregister_command(const AT_command_t* command) {
+    // Local variables.
+    UNA_AT_status_t status = UNA_AT_SUCCESS;
+    AT_status_t at_status = AT_SUCCESS;
+    // Unregister command.
+    at_status = AT_unregister_command(command);
+    AT_exit_error(UNA_AT_ERROR_BASE_AT);
 errors:
     return status;
 }

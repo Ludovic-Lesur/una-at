@@ -41,16 +41,54 @@ typedef enum {
 
 #ifndef UNA_AT_DISABLE
 
+#ifdef UNA_AT_MODE_SLAVE
+/*!******************************************************************
+ * \fn UNA_AT_write_register_cb_t
+ * \brief Write register command callback.
+ *******************************************************************/
+typedef void (*UNA_AT_process_cb_t)(void);
+
+/*!******************************************************************
+ * \fn UNA_AT_write_register_cb_t
+ * \brief Write register command callback.
+ *******************************************************************/
+typedef AT_status_t (*UNA_AT_write_register_cb_t)(uint8_t reg_addr, uint32_t reg_value, uint32_t reg_mask);
+
+/*!******************************************************************
+ * \fn UNA_AT_read_register_cb_t
+ * \brief Read register command callback.
+ *******************************************************************/
+typedef AT_status_t (*UNA_AT_read_register_cb_t)(uint8_t reg_addr, uint32_t* reg_value);
+#endif
+
+/*!******************************************************************
+ * \fn UNA_AT_configuration_t
+ * \brief UNA AT configuration structure.
+ *******************************************************************/
+typedef struct {
+#ifdef UNA_AT_MODE_MASTER
+    uint32_t baud_rate;
+#endif
+#ifdef UNA_AT_MODE_SLAVE
+    UNA_AT_process_cb_t process_callback;
+    UNA_AT_write_register_cb_t write_register_callback;
+    UNA_AT_read_register_cb_t read_register_callback;
+#ifdef UNA_AT_CUSTOM_COMMANDS
+    PARSER_context_t** parser_context_ptr;
+#endif
+#endif
+} UNA_AT_configuration_t;
+
 /*** UNA functions ***/
 
 /*!******************************************************************
- * \fn UNA_AT_status_t UNA_AT_init(uint32_t baud_rate)
+ * \fn UNA_AT_status_t UNA_AT_init(UNA_AT_configuration_t* configuration)
  * \brief Init UNA AT interface.
- * \param[in]   baud_rate: Bus baud rate to use.
+ * \param[in]   configuration: Pointer to the configuration structure.
  * \param[out]  none
  * \retval      Function execution status.
  *******************************************************************/
-UNA_AT_status_t UNA_AT_init(uint32_t baud_rate);
+UNA_AT_status_t UNA_AT_init(UNA_AT_configuration_t* configuration);
 
 /*!******************************************************************
  * \fn UNA_AT_status_t UNA_AT_de_init(void)
@@ -60,17 +98,6 @@ UNA_AT_status_t UNA_AT_init(uint32_t baud_rate);
  * \retval      Function execution status.
  *******************************************************************/
 UNA_AT_status_t UNA_AT_de_init(void);
-
-#ifdef UNA_AT_MODE_SLAVE
-/*!******************************************************************
- * \fn UNA_AT_status_t UNA_AT_process(void)
- * \brief Process UNA interface.
- * \param[in]   none
- * \param[out]  none
- * \retval      Function execution status.
- *******************************************************************/
-UNA_AT_status_t UNA_AT_process(void);
-#endif
 
 #ifdef UNA_AT_MODE_MASTER
 /*!******************************************************************
@@ -118,6 +145,39 @@ UNA_AT_status_t UNA_AT_read_register(UNA_access_parameters_t* read_parameters, u
  * \retval      Function execution status.
  *******************************************************************/
 UNA_AT_status_t UNA_AT_scan(UNA_node_t* nodes_list, uint8_t nodes_list_size, uint8_t* nodes_count);
+#endif
+
+#ifdef UNA_AT_MODE_SLAVE
+/*!******************************************************************
+ * \fn UNA_AT_status_t UNA_AT_process(void)
+ * \brief Process UNA interface.
+ * \param[in]   none
+ * \param[out]  none
+ * \retval      Function execution status.
+ *******************************************************************/
+UNA_AT_status_t UNA_AT_process(void);
+#endif
+
+#if ((defined UNA_AT_MODE_SLAVE) && (defined UNA_AT_CUSTOM_COMMANDS))
+/*!******************************************************************
+ * \fn UNA_AT_status_t UNA_AT_register_command(const AT_command_t* command)
+ * \brief Register additional custom AT command.
+ * \param[in]   command: Pointer to the command to register.
+ * \param[out]  none
+ * \retval      Function execution status.
+ *******************************************************************/
+UNA_AT_status_t UNA_AT_register_command(const AT_command_t* command);
+#endif
+
+#if ((defined UNA_AT_MODE_SLAVE) && (defined UNA_AT_CUSTOM_COMMANDS))
+/*!******************************************************************
+ * \fn UNA_AT_status_t UNA_AT_unregister_command(const AT_command_t* command)
+ * \brief Unregister additional custom AT command.
+ * \param[in]   command: Pointer to the command to register.
+ * \param[out]  none
+ * \retval      Function execution status.
+ *******************************************************************/
+UNA_AT_status_t UNA_AT_unregister_command(const AT_command_t* command);
 #endif
 
 /*******************************************************************/
