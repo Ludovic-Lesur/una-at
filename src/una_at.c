@@ -51,7 +51,7 @@
 #define UNA_AT_REPLY_END                STRING_CHAR_CR
 #endif
 #ifdef UNA_AT_MODE_SLAVE
-#define UNA_AT_REPLY_DELAY_MS           20
+#define UNA_AT_REPLY_DELAY_MS           5
 #endif
 
 /*** UNA AT local structures ***/
