@@ -689,6 +689,34 @@ errors:
 }
 #endif
 
+#if ((defined UNA_AT_MODE_SLAVE) && (defined UNA_AT_CUSTOM_COMMANDS))
+/*******************************************************************/
+void UNA_AT_reply_add_string(char_t* str) {
+    AT_reply_add_string(str);
+}
+#endif
+
+#if ((defined UNA_AT_MODE_SLAVE) && (defined UNA_AT_CUSTOM_COMMANDS))
+/*******************************************************************/
+void UNA_AT_reply_add_integer(int32_t value, STRING_format_t format, uint8_t print_prefix) {
+    AT_reply_add_integer(value, format, print_prefix);
+}
+#endif
+
+#if ((defined UNA_AT_MODE_SLAVE) && (defined UNA_AT_CUSTOM_COMMANDS))
+/*******************************************************************/
+void UNA_AT_reply_add_byte_array(uint8_t* data, uint32_t data_size_bytes, uint8_t print_prefix) {
+    AT_reply_add_byte_array(data, data_size_bytes, print_prefix);
+}
+#endif
+
+#if ((defined UNA_AT_MODE_SLAVE) && (defined UNA_AT_CUSTOM_COMMANDS))
+/*******************************************************************/
+void UNA_AT_send_reply(void) {
+    AT_send_reply();
+}
+#endif
+
 /*** UNA AT compilation flags check ***/
 
 #if (!(defined UNA_AT_MODE_MASTER) && !(defined UNA_AT_MODE_SLAVE))

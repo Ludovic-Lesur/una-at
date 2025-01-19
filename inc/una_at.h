@@ -180,6 +180,54 @@ UNA_AT_status_t UNA_AT_register_command(const AT_command_t* command);
 UNA_AT_status_t UNA_AT_unregister_command(const AT_command_t* command);
 #endif
 
+#if ((defined UNA_AT_MODE_SLAVE) && (defined UNA_AT_CUSTOM_COMMANDS))
+/*!******************************************************************
+ * \fn void UNA_AT_reply_add_string(char_t* str)
+ * \brief Add a message to the reply buffer.
+ * \param[in]   str: null-terminated string to print.
+ * \param[out]  none
+ * \retval      none
+ *******************************************************************/
+void UNA_AT_reply_add_string(char_t* str);
+#endif
+
+#if ((defined UNA_AT_MODE_SLAVE) && (defined UNA_AT_CUSTOM_COMMANDS))
+/*!******************************************************************
+ * \fn void UNA_AT_reply_add_integer(int32_t value, STRING_format_t format, uint8_t print_prefix)
+ * \brief Add an integer to the reply buffer.
+ * \param[in]   value: Integer to print.
+ * \param[in]   format: Format of the output string.
+ * \param[in]   print_prefix: Print the base prefix if non zero.
+ * \param[out]  none
+ * \retval      none
+ *******************************************************************/
+void UNA_AT_reply_add_integer(int32_t value, STRING_format_t format, uint8_t print_prefix);
+#endif
+
+#if ((defined UNA_AT_MODE_SLAVE) && (defined UNA_AT_CUSTOM_COMMANDS))
+/*!******************************************************************
+ * \fn void UNA_AT_reply_add_byte_array(uint8_t instance, uint8_t* data, uint32_t data_size_bytes, uint8_t print_prefix)
+ * \brief Add a byte array to the reply buffer.
+ * \param[in]   data: Byte array to print.
+ * \param[in]   data_size_bytes: Size of the input byte array.
+ * \param[in]   print_prefix: Print the base prefix if non zero.
+ * \param[out]  none
+ * \retval      none
+ *******************************************************************/
+void UNA_AT_reply_add_byte_array(uint8_t* data, uint32_t data_size_bytes, uint8_t print_prefix);
+#endif
+
+#if ((defined UNA_AT_MODE_SLAVE) && (defined UNA_AT_CUSTOM_COMMANDS))
+/*!******************************************************************
+ * \fn void UNA_AT_send_reply(void)
+ * \brief Send the reply buffer.
+ * \param[in]   none
+ * \param[out]  none
+ * \retval      none
+ *******************************************************************/
+void UNA_AT_send_reply(void);
+#endif
+
 /*******************************************************************/
 #define UNA_AT_exit_error(base) { ERROR_check_exit(una_at_status, UNA_AT_SUCCESS, base) }
 
