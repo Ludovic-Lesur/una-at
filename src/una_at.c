@@ -84,9 +84,11 @@ typedef struct {
 
 /*** UNA_AT local functions declaration ***/
 
+#ifdef UNA_AT_MODE_SLAVE
 /*******************************************************************/
 static AT_status_t _UNA_AT_write_register_callback(void);
 static AT_status_t _UNA_AT_read_register_callback(void);
+#endif
 
 /*** AT local global variables ***/
 
@@ -448,7 +450,7 @@ UNA_AT_status_t UNA_AT_init(UNA_AT_configuration_t* configuration) {
     // Init low level interface.
 #ifdef UNA_AT_MODE_MASTER
     // Init bus terminal.
-    terminal_status = TERMINAL_open(UNA_AT_TERMINAL_INSTANCE, baud_rate, &_UNA_AT_rx_irq_callback);
+    terminal_status = TERMINAL_open(UNA_AT_TERMINAL_INSTANCE, (configuration->baud_rate), &_UNA_AT_rx_irq_callback);
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
 #endif
 #ifdef UNA_AT_MODE_SLAVE
