@@ -47,7 +47,6 @@ typedef enum {
 #define LVRM_REGISTER_STATUS_1_MASK_RLSTST                      0x00000003
 
 #define LVRM_REGISTER_CONTROL_1_MASK_RLST                       0x00000001
-#define LVRM_REGISTER_CONTROL_1_MASK_ZCCT                       0x00000002
 
 #define LVRM_REGISTER_ANALOG_DATA_1_MASK_VCOM                   0x0000FFFF
 #define LVRM_REGISTER_ANALOG_DATA_1_MASK_VOUT                   0xFFFF0000
