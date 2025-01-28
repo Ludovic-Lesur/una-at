@@ -21,8 +21,6 @@
 
 #define UNA_AT_TERMINAL_INSTANCE        0
 
-#define UNA_AT_NODE_ADDRESS_LAST        0x7F
-
 //#define UNA_AT_CUSTOM_COMMANDS
 
 #endif /* __UNA_AT_FLAGS_H__ */

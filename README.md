@@ -14,6 +14,7 @@ Here is the versions compatibility table:
 
 | **una-at** | **una-lib** | **embedded-utils** |
 |:---:|:---:|:---:|
+| [sw2.1](https://github.com/Ludovic-Lesur/una-at/releases/tag/sw2.1) | >= [sw2.0](https://github.com/Ludovic-Lesur/una-lib/releases/tag/sw2.0) | >= [sw6.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw6.0) |
 | [sw2.0](https://github.com/Ludovic-Lesur/una-at/releases/tag/sw2.0) | >= [sw2.0](https://github.com/Ludovic-Lesur/una-lib/releases/tag/sw2.0) | >= [sw6.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw6.0) |
 | [sw1.0](https://github.com/Ludovic-Lesur/una-at/releases/tag/sw1.0) | [sw1.0](https://github.com/Ludovic-Lesur/una-lib/releases/tag/sw1.0) | >= [sw6.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw6.0) |
 
@@ -30,5 +31,4 @@ Here is the versions compatibility table:
 | `UNA_AT_USE_REGISTER_ACCESS_TIMEOUT` | `defined` / `undefined` | Enable register access timeout definitions. |
 | `UNA_AT_USE_REGISTER_ERROR_VALUE` | `defined` / `undefined` | Enable register error values definitions. |
 | `UNA_AT_TERMINAL_INSTANCE` | `<value>` | Instance of the terminal used to transmit and receive commands. |
-| `UNA_AT_NODE_ADDRESS_LAST` | `<value>` | Last address value of the AT nodes. |
 | `UNA_AT_CUSTOM_COMMANDS` | `defined` / `undefined` | Enable additional commands registering. |
