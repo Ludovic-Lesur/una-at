@@ -15,13 +15,14 @@
 #endif
 #include "common_registers.h"
 #include "error.h"
-#include "math.h"
+#include "maths.h"
 #include "parser.h"
-#include "string.h"
+#include "strings.h"
 #include "swreg.h"
 #ifdef UNA_AT_MODE_MASTER
 #include "terminal.h"
 #endif
+#include "types.h"
 #include "una.h"
 #include "una_at_hw.h"
 
