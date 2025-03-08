@@ -14,9 +14,10 @@ Here is the versions compatibility table:
 
 | **una-at** | **una-lib** | **embedded-utils** |
 |:---:|:---:|:---:|
-| [sw2.1](https://github.com/Ludovic-Lesur/una-at/releases/tag/sw2.1) | >= [sw2.0](https://github.com/Ludovic-Lesur/una-lib/releases/tag/sw2.0) | >= [sw6.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw6.0) |
-| [sw2.0](https://github.com/Ludovic-Lesur/una-at/releases/tag/sw2.0) | >= [sw2.0](https://github.com/Ludovic-Lesur/una-lib/releases/tag/sw2.0) | >= [sw6.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw6.0) |
-| [sw1.0](https://github.com/Ludovic-Lesur/una-at/releases/tag/sw1.0) | [sw1.0](https://github.com/Ludovic-Lesur/una-lib/releases/tag/sw1.0) | >= [sw6.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw6.0) |
+| [sw2.2](https://github.com/Ludovic-Lesur/una-at/releases/tag/sw2.2) | >= [sw2.1](https://github.com/Ludovic-Lesur/una-lib/releases/tag/sw2.1) | >= [sw7.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw7.0) |
+| [sw2.1](https://github.com/Ludovic-Lesur/una-at/releases/tag/sw2.1) | [sw2.0](https://github.com/Ludovic-Lesur/una-lib/releases/tag/sw2.0) | [sw6.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw6.0) to [sw6.2](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw6.2) |
+| [sw2.0](https://github.com/Ludovic-Lesur/una-at/releases/tag/sw2.0) | [sw2.0](https://github.com/Ludovic-Lesur/una-lib/releases/tag/sw2.0) | [sw6.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw6.0) to [sw6.2](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw6.2) |
+| [sw1.0](https://github.com/Ludovic-Lesur/una-at/releases/tag/sw1.0) | [sw1.0](https://github.com/Ludovic-Lesur/una-lib/releases/tag/sw1.0) | [sw6.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw6.0) to [sw6.2](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw6.2) |
 
 # Compilation flags
 
