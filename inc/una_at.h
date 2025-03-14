@@ -12,6 +12,7 @@
 #include "una_at_flags.h"
 #endif
 #include "at.h"
+#include "error.h"
 #include "terminal.h"
 #include "types.h"
 #include "una.h"
@@ -32,7 +33,7 @@ typedef enum {
     UNA_AT_ERROR_NULL_PARAMETER,
     UNA_AT_ERROR_REPLY_TYPE,
     // Low level drivers errors.
-    UNA_AT_ERROR_BASE_DELAY = 0x0100,
+    UNA_AT_ERROR_BASE_DELAY = ERROR_BASE_STEP,
     UNA_AT_ERROR_BASE_TERMINAL = (UNA_AT_ERROR_BASE_DELAY + UNA_AT_DELAY_ERROR_BASE_LAST),
     UNA_AT_ERROR_BASE_AT = (UNA_AT_ERROR_BASE_TERMINAL + TERMINAL_ERROR_BASE_LAST),
     // Last base value.
