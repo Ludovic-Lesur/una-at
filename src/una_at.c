@@ -493,8 +493,7 @@ UNA_AT_status_t UNA_AT_de_init(void) {
 #ifdef UNA_AT_MODE_SLAVE
     // Unregister commands.
     for (idx = 0; idx < (sizeof(UNA_AT_COMMANDS_LIST) / sizeof(AT_command_t)); idx++) {
-        at_status = AT_unregister_command(&(UNA_AT_COMMANDS_LIST[idx]));
-        AT_exit_error(UNA_AT_ERROR_BASE_AT);
+        AT_unregister_command(&(UNA_AT_COMMANDS_LIST[idx]));
     }
     // Init AT receiver.
     at_status = AT_de_init();
