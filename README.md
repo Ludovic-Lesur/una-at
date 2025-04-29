@@ -35,6 +35,7 @@ Here is the versions compatibility table:
 | `UNA_AT_MODE_SLAVE` | `defined` / `undefined` | Enable slave operating mode. |
 | `UNA_AT_TERMINAL_INSTANCE` | `<value>` | Instance of the terminal used to transmit and receive commands (master mode only). |
 | `UNA_AT_SCAN_REGISTER_ADDRESS` | `<value>` | Address of the common register containing the nodes address and board ID (master mode only). |
-| `UNA_AT_SCAN_REGISTER_MASK_NODE_ADDRESS` | `<value>` | Mask of the node address field of the common register (master mode only). |
-| `UNA_AT_SCAN_REGISTER_MASK_BOARD_ID` | `<value>` | Mask of the board ID field of the common register (master mode only). |
+| `UNA_AT_SCAN_REGISTER_MASK_NODE_ADDRESS` | `<value>` | Mask of the node address field of the scan register (master mode only). |
+| `UNA_AT_SCAN_REGISTER_MASK_BOARD_ID` | `<value>` | Mask of the board ID field of the scan register (master mode only). |
+| `UNA_AT_SCAN_REGISTER_TIMEOUT_MS` | `<value>` | Scan register access timeout in milliseconds (master mode only). |
 | `UNA_AT_CUSTOM_COMMANDS` | `defined` / `undefined` | Enable additional commands registering (slave mode only). |

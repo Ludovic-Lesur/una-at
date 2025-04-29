@@ -615,7 +615,7 @@ UNA_AT_status_t UNA_AT_scan(UNA_node_t* nodes_list, uint8_t nodes_list_size, uin
     (*nodes_count) = 0;
     // Build read input common parameters.
     read_params.reg_addr = UNA_AT_SCAN_REGISTER_ADDRESS;
-    read_params.reply_params.timeout_ms = UNA_AT_DEFAULT_TIMEOUT_MS;
+    read_params.reply_params.timeout_ms = UNA_AT_SCAN_REGISTER_TIMEOUT_MS;
     read_params.reply_params.type = UNA_REPLY_TYPE_VALUE;
     // Loop on all addresses.
     for (node_addr = 0; node_addr < UNA_NODE_ADDRESS_R4S8CR_START; node_addr++) {

@@ -17,10 +17,6 @@
 #include "types.h"
 #include "una.h"
 
-/*** UNA AT macros ***/
-
-#define UNA_AT_DEFAULT_TIMEOUT_MS   200
-
 /*** UNA AT structures ***/
 
 /*!******************************************************************
