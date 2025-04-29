@@ -13,7 +13,6 @@
 #ifdef UNA_AT_MODE_SLAVE
 #include "at.h"
 #endif
-#include "common_registers.h"
 #include "error.h"
 #include "maths.h"
 #include "parser.h"
@@ -615,7 +614,7 @@ UNA_AT_status_t UNA_AT_scan(UNA_node_t* nodes_list, uint8_t nodes_list_size, uin
     // Reset count.
     (*nodes_count) = 0;
     // Build read input common parameters.
-    read_params.reg_addr = COMMON_REGISTER_ADDRESS_NODE_ID;
+    read_params.reg_addr = UNA_AT_SCAN_REGISTER_ADDRESS;
     read_params.reply_params.timeout_ms = UNA_AT_DEFAULT_TIMEOUT_MS;
     read_params.reply_params.type = UNA_REPLY_TYPE_VALUE;
     // Loop on all addresses.
@@ -628,10 +627,10 @@ UNA_AT_status_t UNA_AT_scan(UNA_node_t* nodes_list, uint8_t nodes_list_size, uin
         // Check reply status.
         if (read_status.flags == 0) {
             // Check node address consistency.
-            if (SWREG_read_field(reg_value, COMMON_REGISTER_NODE_ID_MASK_NODE_ADDR) == node_addr) {
+            if (SWREG_read_field(reg_value, UNA_AT_SCAN_REGISTER_MASK_NODE_ADDRESS) == node_addr) {
                 // Update board ID.
-                nodes_list[(*nodes_count)].address = SWREG_read_field(reg_value, COMMON_REGISTER_NODE_ID_MASK_NODE_ADDR);
-                nodes_list[(*nodes_count)].board_id = SWREG_read_field(reg_value, COMMON_REGISTER_NODE_ID_MASK_BOARD_ID);
+                nodes_list[(*nodes_count)].address = SWREG_read_field(reg_value, UNA_AT_SCAN_REGISTER_MASK_NODE_ADDRESS);
+                nodes_list[(*nodes_count)].board_id = SWREG_read_field(reg_value, UNA_AT_SCAN_REGISTER_MASK_BOARD_ID);
                 // Update nodes count.
                 (*nodes_count)++;
             }
