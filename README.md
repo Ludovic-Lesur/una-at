@@ -33,8 +33,8 @@ Here is the versions compatibility table:
 | `UNA_AT_DELAY_ERROR_BASE_LAST` | `<value>` | Last error base of the low level delay driver. |
 | `UNA_AT_MODE_MASTER` | `defined` / `undefined` | Enable master operating mode. |
 | `UNA_AT_MODE_SLAVE` | `defined` / `undefined` | Enable slave operating mode. |
-| `UNA_AT_USE_REGISTER_ACCESS` | `defined` / `undefined` | Enable register access definitions. |
-| `UNA_AT_USE_REGISTER_ACCESS_TIMEOUT` | `defined` / `undefined` | Enable register access timeout definitions. |
-| `UNA_AT_USE_REGISTER_ERROR_VALUE` | `defined` / `undefined` | Enable register error values definitions. |
-| `UNA_AT_TERMINAL_INSTANCE` | `<value>` | Instance of the terminal used to transmit and receive commands. |
-| `UNA_AT_CUSTOM_COMMANDS` | `defined` / `undefined` | Enable additional commands registering. |
+| `UNA_AT_TERMINAL_INSTANCE` | `<value>` | Instance of the terminal used to transmit and receive commands (master mode only). |
+| `UNA_AT_SCAN_REGISTER_ADDRESS` | `<value>` | Address of the common register containing the nodes address and board ID (master mode only). |
+| `UNA_AT_SCAN_REGISTER_MASK_NODE_ADDRESS` | `<value>` | Mask of the node address field of the common register (master mode only). |
+| `UNA_AT_SCAN_REGISTER_MASK_BOARD_ID` | `<value>` | Mask of the board ID field of the common register (master mode only). |
+| `UNA_AT_CUSTOM_COMMANDS` | `defined` / `undefined` | Enable additional commands registering (slave mode only). |
