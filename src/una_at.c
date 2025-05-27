@@ -528,6 +528,9 @@ UNA_AT_status_t UNA_AT_write_register(UNA_access_parameters_t* write_params, uin
     UNA_AT_status_t status = UNA_AT_SUCCESS;
     TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
     uint32_t unused_reg_value = 0;
+#if (UNA_AT_NODE_ACCESS_RETRY_MAX > 1)
+    uint32_t retry_count = 0;
+#endif
     // Check parameters.
     if ((write_params == NULL) || (write_status == NULL)) {
         status = UNA_AT_ERROR_NULL_PARAMETER;
@@ -554,12 +557,20 @@ UNA_AT_status_t UNA_AT_write_register(UNA_access_parameters_t* write_params, uin
         status = _UNA_AT_tx_buffer_add_register(reg_mask);
         if (status != UNA_AT_SUCCESS) goto errors;
     }
-    // Send command.
-    status = _UNA_AT_send(write_params->node_addr);
-    if (status != UNA_AT_SUCCESS) goto errors;
-    // Wait reply.
-    status = _UNA_AT_wait_reply(&(write_params->reply_params), &unused_reg_value, write_status);
-    if (status != UNA_AT_SUCCESS) goto errors;
+#if (UNA_AT_NODE_ACCESS_RETRY_MAX > 1)
+    for (retry_count = 0; retry_count < UNA_AT_NODE_ACCESS_RETRY_MAX; retry_count++) {
+#endif
+        // Send command.
+        status = _UNA_AT_send(write_params->node_addr);
+        if (status != UNA_AT_SUCCESS) goto errors;
+        // Wait reply.
+        status = _UNA_AT_wait_reply(&(write_params->reply_params), &unused_reg_value, write_status);
+        if (status != UNA_AT_SUCCESS) goto errors;
+#if (UNA_AT_NODE_ACCESS_RETRY_MAX > 1)
+        // Exit on first success.
+        if (write_status->flags == 0) break;
+    }
+#endif
 errors:
     return status;
 }
@@ -571,6 +582,9 @@ UNA_AT_status_t UNA_AT_read_register(UNA_access_parameters_t* read_params, uint3
     // Local variables.
     UNA_AT_status_t status = UNA_AT_SUCCESS;
     TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
+#if (UNA_AT_NODE_ACCESS_RETRY_MAX > 1)
+    uint32_t retry_count = 0;
+#endif
     // Check parameters.
     if ((read_params == NULL) || (read_status == NULL) || (reg_value == NULL)) {
         status = UNA_AT_ERROR_NULL_PARAMETER;
@@ -586,12 +600,20 @@ UNA_AT_status_t UNA_AT_read_register(UNA_access_parameters_t* read_params, uint3
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
     terminal_status = TERMINAL_tx_buffer_add_integer(UNA_AT_TERMINAL_INSTANCE, (uint32_t) (read_params->reg_addr), STRING_FORMAT_HEXADECIMAL, 0);
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
-    // Send command.
-    status = _UNA_AT_send(read_params->node_addr);
-    if (status != UNA_AT_SUCCESS) goto errors;
-    // Wait reply.
-    status = _UNA_AT_wait_reply(&(read_params->reply_params), reg_value, read_status);
-    if (status != UNA_AT_SUCCESS) goto errors;
+#if (UNA_AT_NODE_ACCESS_RETRY_MAX > 1)
+    for (retry_count = 0; retry_count < UNA_AT_NODE_ACCESS_RETRY_MAX; retry_count++) {
+#endif
+        // Send command.
+        status = _UNA_AT_send(read_params->node_addr);
+        if (status != UNA_AT_SUCCESS) goto errors;
+        // Wait reply.
+        status = _UNA_AT_wait_reply(&(read_params->reply_params), reg_value, read_status);
+        if (status != UNA_AT_SUCCESS) goto errors;
+#if (UNA_AT_NODE_ACCESS_RETRY_MAX > 1)
+        // Exit on first success.
+        if (read_status->flags == 0) break;
+    }
+#endif
 errors:
     return status;
 }

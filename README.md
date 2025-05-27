@@ -33,9 +33,10 @@ Here is the versions compatibility table:
 | `UNA_AT_DISABLE_FLAGS_FILE` | `defined` / `undefined` | Disable the `una_at_flags.h` header file inclusion when compilation flags are given in the project settings or by command line. |
 | `UNA_AT_DISABLE` | `defined` / `undefined` | Disable the UNA AT functions. |
 | `UNA_AT_DELAY_ERROR_BASE_LAST` | `<value>` | Last error base of the low level delay driver. |
+| `UNA_AT_TERMINAL_INSTANCE` | `<value>` | Instance of the terminal used to transmit and receive commands. |
 | `UNA_AT_MODE_MASTER` | `defined` / `undefined` | Enable master operating mode. |
 | `UNA_AT_MODE_SLAVE` | `defined` / `undefined` | Enable slave operating mode. |
-| `UNA_AT_TERMINAL_INSTANCE` | `<value>` | Instance of the terminal used to transmit and receive commands (master mode only). |
+| `UNA_AT_NODE_ACCESS_RETRY_MAX` | `<value>` | Number of slave node access retries in case of failure (master mode only). |
 | `UNA_AT_SCAN_REGISTER_ADDRESS` | `<value>` | Address of the common register containing the nodes address and board ID (master mode only). |
 | `UNA_AT_SCAN_REGISTER_MASK_NODE_ADDRESS` | `<value>` | Mask of the node address field of the scan register (master mode only). |
 | `UNA_AT_SCAN_REGISTER_MASK_BOARD_ID` | `<value>` | Mask of the board ID field of the scan register (master mode only). |
