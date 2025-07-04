@@ -14,6 +14,7 @@ Here is the versions compatibility table:
 
 | **una-at** | **una-lib** | **embedded-utils** |
 |:---:|:---:|:---:|
+| [sw5.4](https://github.com/Ludovic-Lesur/una-at/releases/tag/sw5.4) | >= [sw2.2](https://github.com/Ludovic-Lesur/una-lib/releases/tag/sw2.2) | >= [sw7.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw7.0) |
 | [sw5.3](https://github.com/Ludovic-Lesur/una-at/releases/tag/sw5.3) | >= [sw2.2](https://github.com/Ludovic-Lesur/una-lib/releases/tag/sw2.2) | >= [sw7.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw7.0) |
 | [sw5.2](https://github.com/Ludovic-Lesur/una-at/releases/tag/sw5.2) | >= [sw2.2](https://github.com/Ludovic-Lesur/una-lib/releases/tag/sw2.2) | >= [sw7.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw7.0) |
 | [sw5.1](https://github.com/Ludovic-Lesur/una-at/releases/tag/sw5.1) | >= [sw2.2](https://github.com/Ludovic-Lesur/una-lib/releases/tag/sw2.2) | >= [sw7.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw7.0) |
