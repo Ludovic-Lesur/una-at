@@ -331,9 +331,6 @@ static UNA_AT_status_t _UNA_AT_send(UNA_node_address_t node_address) {
     TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
     // Reset replies.
     _UNA_AT_flush_replies();
-    // Add ending marker.
-    terminal_status = TERMINAL_tx_buffer_add_string(UNA_AT_TERMINAL_INSTANCE, UNA_AT_COMMAND_END);
-    TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
     // Send command.
     terminal_status = TERMINAL_set_destination_address(UNA_AT_TERMINAL_INSTANCE, node_address);
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
@@ -513,6 +510,9 @@ UNA_AT_status_t UNA_AT_send_command(UNA_command_parameters_t* command_params) {
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
     terminal_status = TERMINAL_tx_buffer_add_string(UNA_AT_TERMINAL_INSTANCE, (command_params->command));
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
+    // Add ending marker.
+    terminal_status = TERMINAL_tx_buffer_add_string(UNA_AT_TERMINAL_INSTANCE, UNA_AT_COMMAND_END);
+    TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
     // Send command.
     status = _UNA_AT_send(command_params->node_addr);
     if (status != UNA_AT_SUCCESS) goto errors;
@@ -557,6 +557,9 @@ UNA_AT_status_t UNA_AT_write_register(UNA_access_parameters_t* write_params, uin
         status = _UNA_AT_tx_buffer_add_register(reg_mask);
         if (status != UNA_AT_SUCCESS) goto errors;
     }
+    // Add ending marker.
+    terminal_status = TERMINAL_tx_buffer_add_string(UNA_AT_TERMINAL_INSTANCE, UNA_AT_COMMAND_END);
+    TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
 #if (UNA_AT_NODE_ACCESS_RETRY_MAX > 1)
     for (retry_count = 0; retry_count < UNA_AT_NODE_ACCESS_RETRY_MAX; retry_count++) {
 #endif
@@ -599,6 +602,9 @@ UNA_AT_status_t UNA_AT_read_register(UNA_access_parameters_t* read_params, uint3
     terminal_status = TERMINAL_tx_buffer_add_string(UNA_AT_TERMINAL_INSTANCE, UNA_AT_COMMAND_READ_REGISTER);
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
     terminal_status = TERMINAL_tx_buffer_add_integer(UNA_AT_TERMINAL_INSTANCE, (uint32_t) (read_params->reg_addr), STRING_FORMAT_HEXADECIMAL, 0);
+    TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
+    // Add ending marker.
+    terminal_status = TERMINAL_tx_buffer_add_string(UNA_AT_TERMINAL_INSTANCE, UNA_AT_COMMAND_END);
     TERMINAL_exit_error(UNA_AT_ERROR_BASE_TERMINAL);
 #if (UNA_AT_NODE_ACCESS_RETRY_MAX > 1)
     for (retry_count = 0; retry_count < UNA_AT_NODE_ACCESS_RETRY_MAX; retry_count++) {
