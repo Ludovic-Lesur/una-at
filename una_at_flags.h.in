@@ -1,0 +1,36 @@
+/*
+ * una_at_flags.h
+ *
+ *  Created on: 07 dec. 2024
+ *      Author: Ludo
+ */
+
+#ifndef __UNA_AT_FLAGS_H__
+#define __UNA_AT_FLAGS_H__
+
+/*** UNA AT compilation flags ***/
+
+#cmakedefine UNA_AT_DELAY_ERROR_BASE_LAST               @UNA_AT_DELAY_ERROR_BASE_LAST@
+
+#cmakedefine UNA_AT_TERMINAL_INSTANCE                   @UNA_AT_TERMINAL_INSTANCE@
+
+#cmakedefine UNA_AT_MODE_MASTER
+#cmakedefine UNA_AT_MODE_SLAVE
+
+#ifdef UNA_AT_MODE_MASTER
+
+#cmakedefine UNA_AT_NODE_ACCESS_RETRY_MAX               @UNA_AT_NODE_ACCESS_RETRY_MAX@
+#cmakedefine UNA_AT_SCAN_REGISTER_ADDRESS               @UNA_AT_SCAN_REGISTER_ADDRESS@
+#cmakedefine UNA_AT_SCAN_REGISTER_MASK_NODE_ADDRESS     @UNA_AT_SCAN_REGISTER_MASK_NODE_ADDRESS@
+#cmakedefine UNA_AT_SCAN_REGISTER_MASK_BOARD_ID         @UNA_AT_SCAN_REGISTER_MASK_BOARD_ID@
+#cmakedefine UNA_AT_SCAN_REGISTER_TIMEOUT_MS            @UNA_AT_SCAN_REGISTER_TIMEOUT_MS@
+
+#endif /* UNA_AT_MODE_MASTER */
+
+#ifdef UNA_AT_MODE_SLAVE
+
+#cmakedefine UNA_AT_CUSTOM_COMMANDS
+
+#endif /* UNA_AT_MODE_SLAVE */
+
+#endif /* __UNA_AT_FLAGS_H__ */

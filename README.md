@@ -44,3 +44,31 @@ Here is the versions compatibility table:
 | `UNA_AT_SCAN_REGISTER_MASK_BOARD_ID` | `<value>` | Mask of the board ID field of the scan register (master mode only). |
 | `UNA_AT_SCAN_REGISTER_TIMEOUT_MS` | `<value>` | Scan register access timeout in milliseconds (master mode only). |
 | `UNA_AT_CUSTOM_COMMANDS` | `defined` / `undefined` | Enable additional commands registering (slave mode only). |
+
+# Build
+
+A static library can be compiled by command line with `cmake`.
+
+```bash
+mkdir build
+cd build
+cmake -DCMAKE_TOOLCHAIN_FILE="<toolchain_file_path>" \
+      -DTOOLCHAIN_PATH="<arm-none-eabi-gcc_path>" \
+      -DTYPES_PATH="<types_file_path>" \
+      -DUNA_LIB_PATH="<una-lib_path>" \
+      -DEMBEDDED_UTILS_PATH="<embedded-utils_path>" \
+      -DEMBEDDED_UTILS_HW_INTERFACE_ERROR_BASE_LAST=0 \
+      -DEMBEDDED_UTILS_TERMINAL_INSTANCES_NUMBER=1 \
+      -DUNA_AT_DELAY_ERROR_BASE_LAST=0 \
+      -DUNA_AT_TERMINAL_INSTANCE=0 \
+      -DUNA_AT_MODE_MASTER=ON \
+      -DUNA_AT_MODE_SLAVE=OFF \
+      -DUNA_AT_NODE_ACCESS_RETRY_MAX=3 \
+      -DUNA_AT_SCAN_REGISTER_ADDRESS=0 \
+      -DUNA_AT_SCAN_REGISTER_MASK_NODE_ADDRESS=0 \
+      -DUNA_AT_SCAN_REGISTER_MASK_BOARD_ID=0 \
+      -DUNA_AT_SCAN_REGISTER_TIMEOUT_MS=0 \
+      -DUNA_AT_CUSTOM_COMMANDS=OFF \
+      -G "Unix Makefiles" ..
+make all
+```
