@@ -134,14 +134,14 @@ UNA_AT_status_t UNA_AT_read_register(UNA_access_parameters_t* read_parameters, u
 
 #ifdef UNA_AT_MODE_MASTER
 /*!******************************************************************
- * \fn UNA_AT_status_t UNA_AT_scan(UNA_node_t* nodes_list, uint8_t nodes_list_size, uint8_t* nodes_count)
+ * \fn UNA_AT_status_t UNA_AT_scan(UNA_node_t* node_list, uint8_t node_list_size, uint8_t* node_count)
  * \brief Scan all AT nodes connected to the bus.
- * \param[in]   nodes_list_size: Maximum size of the node list.
- * \param[out]  nodes_list: Pointer to the list where to store the nodes.
- * \param[out]  nodes_count: Pointer to the number of nodes detected.
+ * \param[in]   node_list_size: Maximum size of the node list.
+ * \param[out]  node_list: Pointer to the list where to store the nodes.
+ * \param[out]  node_count: Pointer to the number of node(s) detected.
  * \retval      Function execution status.
  *******************************************************************/
-UNA_AT_status_t UNA_AT_scan(UNA_node_t* nodes_list, uint8_t nodes_list_size, uint8_t* nodes_count);
+UNA_AT_status_t UNA_AT_scan(UNA_node_t* node_list, uint8_t node_list_size, uint8_t* node_count);
 #endif
 
 #ifdef UNA_AT_MODE_SLAVE

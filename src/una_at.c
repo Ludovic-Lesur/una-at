@@ -627,7 +627,7 @@ errors:
 
 #ifdef UNA_AT_MODE_MASTER
 /*******************************************************************/
-UNA_AT_status_t UNA_AT_scan(UNA_node_t* nodes_list, uint8_t nodes_list_size, uint8_t* nodes_count) {
+UNA_AT_status_t UNA_AT_scan(UNA_node_t* node_list, uint8_t node_list_size, uint8_t* node_count) {
     // Local variables.
     UNA_AT_status_t status = UNA_AT_SUCCESS;
     UNA_access_parameters_t read_params;
@@ -635,12 +635,12 @@ UNA_AT_status_t UNA_AT_scan(UNA_node_t* nodes_list, uint8_t nodes_list_size, uin
     UNA_node_address_t node_addr = 0;
     uint32_t reg_value = 0;
     // Check parameters.
-    if ((nodes_list == NULL) || (nodes_count == NULL)) {
+    if ((node_list == NULL) || (node_count == NULL)) {
         status = UNA_AT_ERROR_NULL_PARAMETER;
         goto errors;
     }
     // Reset count.
-    (*nodes_count) = 0;
+    (*node_count) = 0;
     // Build read input common parameters.
     read_params.reg_addr = UNA_AT_SCAN_REGISTER_ADDRESS;
     read_params.reply_params.timeout_ms = UNA_AT_SCAN_REGISTER_TIMEOUT_MS;
@@ -657,14 +657,14 @@ UNA_AT_status_t UNA_AT_scan(UNA_node_t* nodes_list, uint8_t nodes_list_size, uin
             // Check node address consistency.
             if (SWREG_read_field(reg_value, UNA_AT_SCAN_REGISTER_MASK_NODE_ADDRESS) == node_addr) {
                 // Update board ID.
-                nodes_list[(*nodes_count)].address = SWREG_read_field(reg_value, UNA_AT_SCAN_REGISTER_MASK_NODE_ADDRESS);
-                nodes_list[(*nodes_count)].board_id = SWREG_read_field(reg_value, UNA_AT_SCAN_REGISTER_MASK_BOARD_ID);
-                // Update nodes count.
-                (*nodes_count)++;
+                node_list[(*node_count)].address = SWREG_read_field(reg_value, UNA_AT_SCAN_REGISTER_MASK_NODE_ADDRESS);
+                node_list[(*node_count)].board_id = SWREG_read_field(reg_value, UNA_AT_SCAN_REGISTER_MASK_BOARD_ID);
+                // Update node count.
+                (*node_count)++;
             }
         }
         // Check index.
-        if ((*nodes_count) >= nodes_list_size) break;
+        if ((*node_count) >= node_list_size) break;
     }
 errors:
     return status;
