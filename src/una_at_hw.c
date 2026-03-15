@@ -20,7 +20,7 @@
 /*******************************************************************/
 UNA_AT_status_t __attribute__((weak)) UNA_AT_HW_delay_milliseconds(uint32_t delay_ms) {
     // Local variables.
-    UNA_AT_status_t status = UNA_AT_SUCCESS;
+    UNA_AT_status_t status = UNA_AT_ERROR_HW_FUNCTION_NOT_IMPLEMENTED;
     /* To be implemented */
     UNUSED(delay_ms);
     return status;
